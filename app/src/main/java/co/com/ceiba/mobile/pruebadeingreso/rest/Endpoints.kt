@@ -1,7 +1,7 @@
-package co.com.ceiba.mobile.pruebadeingreso.rest;
+package co.com.ceiba.mobile.pruebadeingreso.rest
 
-public class Endpoints {
-    public static final String URL_BASE = "https://jsonplaceholder.typicode.com";
-    public static final String GET_USERS = "/users";
-    public static final String GET_POST_USER = "/posts?";
+object Endpoints {
+    const val URL_BASE = "https://jsonplaceholder.typicode.com"
+    const val GET_USERS = "/users"
+    const val GET_POST_USER = "/posts?"
 }
