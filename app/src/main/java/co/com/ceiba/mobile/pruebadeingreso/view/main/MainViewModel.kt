@@ -32,22 +32,36 @@ class MainViewModel @Inject constructor(
         object Empty : MainEvent()
     }
 
-    private val _userList = MutableLiveData<MainEvent>(MainEvent.Empty)
-    val userList: LiveData<MainEvent> = _userList
+    private val _userCall = MutableLiveData<MainEvent>(MainEvent.Empty)
+    val userCall: LiveData<MainEvent> = _userCall
+    private var _localUserList: List<User> = listOf()
+    val localUserList: List<User>
+        get() = _localUserList
 
     fun getUserList() {
         viewModelScope.launch(dispatchers.io) {
-            _userList.postValue(MainEvent.Loading)
+            _userCall.postValue(MainEvent.Loading)
             when (val usersResponse = mainRepository.getUsers()) {
-                is Resource.Error -> _userList.postValue(
+                is Resource.Error -> _userCall.postValue(
                     MainEvent.Failure(
                         usersResponse.message ?: "No data found"
                     )
                 )
                 is Resource.Success -> {
-                    _userList.postValue(MainEvent.Success(usersResponse.data!!))
+                    _localUserList = usersResponse.data ?: listOf()
+                    _userCall.postValue(MainEvent.Success(_localUserList))
                 }
             }
+        }
+    }
+
+    fun getUserBySearchInput(searchInput: String) {
+        viewModelScope.launch(dispatchers.io) {
+            _userCall.postValue(MainEvent.Loading)
+            val filteredList = _localUserList.filter {
+                it.name.lowercase().contains(searchInput.lowercase())
+            }
+            _userCall.postValue(MainEvent.Success(filteredList))
         }
     }
 }

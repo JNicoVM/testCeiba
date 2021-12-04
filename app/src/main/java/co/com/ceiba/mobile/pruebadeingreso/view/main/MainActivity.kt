@@ -56,7 +56,9 @@ class MainActivity : AppCompatActivity() {
      */
     private fun initEditTextView(){
         binding.editTextSearch.doAfterTextChanged {
-
+            lifecycleScope.launchWhenCreated {
+                viewModel.getUserBySearchInput(it.toString())
+            }
         }
     }
 
@@ -66,7 +68,7 @@ class MainActivity : AppCompatActivity() {
     private fun getUsers(){
         viewModel.getUserList()
         lifecycleScope.launchWhenCreated {
-            viewModel.userList.observe(this@MainActivity, Observer { mainEvent ->
+            viewModel.userCall.observe(this@MainActivity, Observer { mainEvent ->
                when(mainEvent){
                    is MainViewModel.MainEvent.Success ->{
                        userAdapter.differ.submitList(mainEvent.users)
