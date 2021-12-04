@@ -8,6 +8,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import android.app.ProgressDialog
+import android.opengl.Visibility
+import android.view.View
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
@@ -74,10 +76,14 @@ class MainActivity : AppCompatActivity() {
                when(mainEvent){
                    is MainViewModel.MainEvent.Success ->{
                        loadingDialog.hide()
+                       binding.textError.visibility = View.GONE
+                       binding.recyclerViewSearchResults.visibility =  View.VISIBLE
                        userAdapter.differ.submitList(mainEvent.users)
                    }
                    is MainViewModel.MainEvent.Failure ->{
                        loadingDialog.hide()
+                       binding.textError.visibility = View.VISIBLE
+                       binding.recyclerViewSearchResults.visibility =  View.GONE
                        Toast.makeText(this@MainActivity, "No data found", Toast.LENGTH_SHORT).show()
                    }
                    is MainViewModel.MainEvent.Loading ->{
