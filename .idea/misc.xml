@@ -5,6 +5,9 @@
       <map>
         <entry key="..\:/Nicolas/test_ceiba/app/src/main/res/layout/activity_main.xml" value="0.17831813576494426" />
         <entry key="..\:/Nicolas/test_ceiba/app/src/main/res/layout/activity_post.xml" value="0.276268115942029" />
+        <entry key="..\:/Nicolas/test_ceiba/app/src/main/res/layout/empty_view.xml" value="0.20520833333333333" />
+        <entry key="..\:/Nicolas/test_ceiba/app/src/main/res/layout/post_list_item.xml" value="0.20520833333333333" />
+        <entry key="..\:/Nicolas/test_ceiba/app/src/main/res/layout/user_list_item.xml" value="0.20520833333333333" />
       </map>
     </option>
   </component>
