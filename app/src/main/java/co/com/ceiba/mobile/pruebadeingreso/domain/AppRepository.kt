@@ -19,5 +19,9 @@ class AppRepository@Inject constructor(
     suspend fun getUsersFromDb(): Resource<List<User>> {
         return dao.getUsers()
     }
+
+    suspend fun insertUsersFromDb(users: List<User>): Resource<Boolean> {
+        return dao.insertUsers(users)
+    }
 }
 

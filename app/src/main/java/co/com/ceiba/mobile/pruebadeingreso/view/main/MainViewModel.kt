@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import co.com.ceiba.mobile.pruebadeingreso.domain.models.User
 import co.com.ceiba.mobile.pruebadeingreso.domain.usescases.GetUsersFromDbUseCase
 import co.com.ceiba.mobile.pruebadeingreso.domain.usescases.GetUsersFromNetworkUseCase
+import co.com.ceiba.mobile.pruebadeingreso.domain.usescases.InsertUsersIntoDbUseCase
 import co.com.ceiba.mobile.pruebadeingreso.utils.DispatcherProvider
 import co.com.ceiba.mobile.pruebadeingreso.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +18,7 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val getUsersFromNetworkUseCase: GetUsersFromNetworkUseCase,
     private val getUsersFromDbUseCase: GetUsersFromDbUseCase,
+    private val insertUsersIntoDbUseCase: InsertUsersIntoDbUseCase,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
@@ -56,6 +58,7 @@ class MainViewModel @Inject constructor(
                             )
                             is Resource.Success -> {
                                 _localUserList = usersResponse.data ?: listOf()
+                                insertUsersIntoDbUseCase.invoke(_localUserList)
                                 _userCall.postValue(MainEvent.Success(_localUserList))
                             }
                         }
