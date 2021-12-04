@@ -3,7 +3,7 @@ package co.com.ceiba.mobile.pruebadeingreso.data.mappers
 import co.com.ceiba.mobile.pruebadeingreso.data.network.models.UserResponse
 import co.com.ceiba.mobile.pruebadeingreso.domain.models.User
 
-class UserNetworkMapper: ModelMapper<UserResponse, User> {
+class UserNetworkDomainMapper: ModelMapper<UserResponse, User> {
 
     /**
      * Model origin in this case is coming from a network request

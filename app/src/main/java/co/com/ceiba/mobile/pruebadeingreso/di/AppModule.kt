@@ -1,8 +1,5 @@
 package co.com.ceiba.mobile.pruebadeingreso.di
 
-import co.com.ceiba.mobile.pruebadeingreso.data.network.APIService
-import co.com.ceiba.mobile.pruebadeingreso.domain.repositories.main.DefaultMainRepository
-import co.com.ceiba.mobile.pruebadeingreso.domain.repositories.main.MainRepository
 import co.com.ceiba.mobile.pruebadeingreso.utils.DispatcherProvider
 import dagger.Module
 import dagger.Provides
@@ -15,10 +12,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-
-    @Singleton
-    @Provides
-    fun provideMainRepository(api: APIService) : MainRepository = DefaultMainRepository(api = api)
 
     @Singleton
     @Provides

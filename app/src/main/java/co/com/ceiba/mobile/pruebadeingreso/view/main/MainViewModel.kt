@@ -4,20 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.com.ceiba.mobile.pruebadeingreso.data.network.models.UserResponse
 import co.com.ceiba.mobile.pruebadeingreso.domain.models.User
-import co.com.ceiba.mobile.pruebadeingreso.domain.repositories.main.MainRepository
+import co.com.ceiba.mobile.pruebadeingreso.domain.usescases.GetUsersFromDbUseCase
+import co.com.ceiba.mobile.pruebadeingreso.domain.usescases.GetUsersFromNetworkUseCase
 import co.com.ceiba.mobile.pruebadeingreso.utils.DispatcherProvider
 import co.com.ceiba.mobile.pruebadeingreso.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val mainRepository: MainRepository,
+    private val getUsersFromNetworkUseCase: GetUsersFromNetworkUseCase,
+    private val getUsersFromDbUseCase: GetUsersFromDbUseCase,
     private val dispatchers: DispatcherProvider
 ) : ViewModel() {
 
@@ -41,17 +40,33 @@ class MainViewModel @Inject constructor(
     fun getUserList() {
         viewModelScope.launch(dispatchers.io) {
             _userCall.postValue(MainEvent.Loading)
-            when (val usersResponse = mainRepository.getUsers()) {
+            when(val usersFromDbResponse = getUsersFromDbUseCase.invoke()){
                 is Resource.Error -> _userCall.postValue(
                     MainEvent.Failure(
-                        usersResponse.message ?: "No data found"
+                        usersFromDbResponse.message ?: "No data found"
                     )
                 )
                 is Resource.Success -> {
-                    _localUserList = usersResponse.data ?: listOf()
-                    _userCall.postValue(MainEvent.Success(_localUserList))
+                    if(usersFromDbResponse.data?.isEmpty() != false){
+                        when (val usersResponse = getUsersFromNetworkUseCase.invoke()) {
+                            is Resource.Error -> _userCall.postValue(
+                                MainEvent.Failure(
+                                    usersResponse.message ?: "No data found"
+                                )
+                            )
+                            is Resource.Success -> {
+                                _localUserList = usersResponse.data ?: listOf()
+                                _userCall.postValue(MainEvent.Success(_localUserList))
+                            }
+                        }
+                    }else{
+                        _localUserList = usersFromDbResponse.data
+                        _userCall.postValue(MainEvent.Success(_localUserList))
+                    }
+
                 }
             }
+
         }
     }
 
