@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.com.ceiba.mobile.pruebadeingreso.data.network.models.UserResponse
+import co.com.ceiba.mobile.pruebadeingreso.domain.models.User
 import co.com.ceiba.mobile.pruebadeingreso.domain.repositories.main.MainRepository
 import co.com.ceiba.mobile.pruebadeingreso.utils.DispatcherProvider
 import co.com.ceiba.mobile.pruebadeingreso.utils.Resource
@@ -25,7 +26,7 @@ class MainViewModel @Inject constructor(
      * of an abstract MainActivity data request
      */
     sealed class MainEvent {
-        class Success(val userResponse: UserResponse) : MainEvent()
+        class Success(val users: List<User>) : MainEvent()
         class Failure(val errorText: String) : MainEvent()
         object Loading : MainEvent()
         object Empty : MainEvent()
