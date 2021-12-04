@@ -8,10 +8,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import android.app.ProgressDialog
+import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import co.com.ceiba.mobile.pruebadeingreso.adapters.UserAdapter
+import java.time.Duration
 
 
 @AndroidEntryPoint
@@ -71,11 +73,12 @@ class MainActivity : AppCompatActivity() {
             viewModel.userCall.observe(this@MainActivity, Observer { mainEvent ->
                when(mainEvent){
                    is MainViewModel.MainEvent.Success ->{
-                       userAdapter.differ.submitList(mainEvent.users)
                        loadingDialog.hide()
+                       userAdapter.differ.submitList(mainEvent.users)
                    }
                    is MainViewModel.MainEvent.Failure ->{
                        loadingDialog.hide()
+                       Toast.makeText(this@MainActivity, "No data found", Toast.LENGTH_SHORT).show()
                    }
                    is MainViewModel.MainEvent.Loading ->{
                        loadingDialog.show()
