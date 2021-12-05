@@ -1,6 +1,8 @@
 package co.com.ceiba.mobile.pruebadeingreso.view.post
 
 import androidx.lifecycle.*
+import co.com.ceiba.mobile.pruebadeingreso.domain.AppRepository
+import co.com.ceiba.mobile.pruebadeingreso.domain.Repository
 import co.com.ceiba.mobile.pruebadeingreso.domain.models.Post
 import co.com.ceiba.mobile.pruebadeingreso.domain.usescases.GetPostsFromNetworkUseCase
 import co.com.ceiba.mobile.pruebadeingreso.rest.Const
@@ -8,13 +10,13 @@ import co.com.ceiba.mobile.pruebadeingreso.utils.DispatcherProvider
 import co.com.ceiba.mobile.pruebadeingreso.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-    private val getPostsFromNetworkUseCase: GetPostsFromNetworkUseCase,
-    private val dispatchers: DispatcherProvider,
+    private val repository: Repository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel(){
 
@@ -63,9 +65,9 @@ class PostViewModel @Inject constructor(
      *   once the data arrives
      */
     fun getPostList() {
-        viewModelScope.launch(dispatchers.io) {
+        viewModelScope.launch(Dispatchers.IO) {
             _postCall.postValue(PostEvent.Loading)
-            when (val postsResponse = getPostsFromNetworkUseCase.invoke(_id)) {
+            when (val postsResponse = repository.getPostsFromNetwork(_id)) {
                 is Resource.Error -> _postCall.postValue(
                     PostEvent.Failure(
                         postsResponse.message ?: "No data found"

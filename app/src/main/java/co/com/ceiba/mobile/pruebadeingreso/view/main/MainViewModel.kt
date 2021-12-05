@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.com.ceiba.mobile.pruebadeingreso.domain.AppRepository
+import co.com.ceiba.mobile.pruebadeingreso.domain.Repository
 import co.com.ceiba.mobile.pruebadeingreso.domain.models.User
 import co.com.ceiba.mobile.pruebadeingreso.domain.usescases.GetUsersFromDbUseCase
 import co.com.ceiba.mobile.pruebadeingreso.domain.usescases.GetUsersFromNetworkUseCase
@@ -11,16 +13,14 @@ import co.com.ceiba.mobile.pruebadeingreso.domain.usescases.InsertUsersIntoDbUse
 import co.com.ceiba.mobile.pruebadeingreso.utils.DispatcherProvider
 import co.com.ceiba.mobile.pruebadeingreso.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.Dispatcher
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val getUsersFromNetworkUseCase: GetUsersFromNetworkUseCase,
-    private val getUsersFromDbUseCase: GetUsersFromDbUseCase,
-    private val insertUsersIntoDbUseCase: InsertUsersIntoDbUseCase,
-    private val dispatchers: DispatcherProvider
+    private val repository: Repository,
 ) : ViewModel() {
 
     /**
@@ -47,9 +47,9 @@ class MainViewModel @Inject constructor(
      *  ...Does find users It gives the view data to show users
      */
     fun getUserList() {
-        viewModelScope.launch(dispatchers.io) {
+        viewModelScope.launch(Dispatchers.IO) {
             _userCall.postValue(MainEvent.Loading)
-            when(val usersFromDbResponse = getUsersFromDbUseCase.invoke()){
+            when(val usersFromDbResponse = repository.getUsersFromDb()){
                 is Resource.Error -> _userCall.postValue(
                     MainEvent.Failure(
                         usersFromDbResponse.message ?: "No data found"
@@ -57,7 +57,7 @@ class MainViewModel @Inject constructor(
                 )
                 is Resource.Success -> {
                     if(usersFromDbResponse.data?.isEmpty() != false){
-                        when (val usersResponse = getUsersFromNetworkUseCase.invoke()) {
+                        when (val usersResponse = repository.getUsersFromNetwork()) {
                             is Resource.Error -> _userCall.postValue(
                                 MainEvent.Failure(
                                     usersResponse.message ?: "No data found"
@@ -65,7 +65,7 @@ class MainViewModel @Inject constructor(
                             )
                             is Resource.Success -> {
                                 _localUserList = usersResponse.data ?: listOf()
-                                insertUsersIntoDbUseCase.invoke(_localUserList)
+                                repository.insertUsersIntoDb(_localUserList)
                                 _userCall.postValue(MainEvent.Success(_localUserList))
                             }
                         }
@@ -86,7 +86,7 @@ class MainViewModel @Inject constructor(
      * ...It contains an element, then It is shown at the view with similar elements
      */
     fun getUserBySearchInput(searchInput: String) {
-        viewModelScope.launch(dispatchers.io) {
+        viewModelScope.launch(Dispatchers.IO) {
             _userCall.postValue(MainEvent.Loading)
             val filteredList = _localUserList.filter {
                 it.name.lowercase().contains(searchInput.lowercase())

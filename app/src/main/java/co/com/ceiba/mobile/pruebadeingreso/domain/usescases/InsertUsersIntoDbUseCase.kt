@@ -8,5 +8,5 @@ import javax.inject.Inject
 class InsertUsersIntoDbUseCase @Inject constructor(private val repository: AppRepository) {
 
     suspend operator fun invoke(user: List<User>): Resource<Boolean> =
-        repository.insertUsersFromDb(user)
+        repository.insertUsersIntoDb(user)
 }
