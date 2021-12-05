@@ -1,14 +1,20 @@
 package co.com.ceiba.mobile.pruebadeingreso.view.post
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import co.com.ceiba.mobile.pruebadeingreso.domain.models.Post
+import co.com.ceiba.mobile.pruebadeingreso.domain.usescases.GetPostsFromNetworkUseCase
 import co.com.ceiba.mobile.pruebadeingreso.rest.Const
+import co.com.ceiba.mobile.pruebadeingreso.utils.DispatcherProvider
+import co.com.ceiba.mobile.pruebadeingreso.utils.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@ViewModelScoped
+@HiltViewModel
 class PostViewModel @Inject constructor(
+    private val getPostsFromNetworkUseCase: GetPostsFromNetworkUseCase,
+    private val dispatchers: DispatcherProvider,
     savedStateHandle: SavedStateHandle
 ) : ViewModel(){
 
@@ -34,5 +40,43 @@ class PostViewModel @Inject constructor(
         _id = savedStateHandle.get<Int>(Const.ID) ?: -1
     }
 
+    /**
+     * Sealed class @PostEvent then the @PostViewModel has all necessary characteristics
+     * of an abstract PostActivity data request
+     */
+    sealed class PostEvent {
+        class Success(val posts: List<Post>) : PostEvent()
+        class Failure(val errorText: String) : PostEvent()
+        object Loading : PostEvent()
+        object Empty :PostEvent()
+    }
+
+    private val _postCall = MutableLiveData<PostEvent>(PostEvent.Empty)
+    val postCall: LiveData<PostEvent> = _postCall
+    private var _localPostList: List<Post> = listOf()
+    val localPostList: List<Post>
+        get() = _localPostList
+
+    /**
+     *  Get Post List
+     *   It calls @GetPostNetWorkUsesCase and then shares the data to the view
+     *   once the data arrives
+     */
+    fun getPostList() {
+        viewModelScope.launch(dispatchers.io) {
+            _postCall.postValue(PostEvent.Loading)
+            when (val postsResponse = getPostsFromNetworkUseCase.invoke(_id)) {
+                is Resource.Error -> _postCall.postValue(
+                    PostEvent.Failure(
+                        postsResponse.message ?: "No data found"
+                    )
+                )
+                is Resource.Success -> {
+                    _localPostList = postsResponse.data ?: listOf()
+                    _postCall.postValue(PostEvent.Success(_localPostList))
+                }
+            }
+        }
+    }
 
 }

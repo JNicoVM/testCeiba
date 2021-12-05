@@ -1,6 +1,7 @@
 package co.com.ceiba.mobile.pruebadeingreso.di
 
 import co.com.ceiba.mobile.pruebadeingreso.data.network.APIService
+import co.com.ceiba.mobile.pruebadeingreso.data.network.httpClient.HttpClient
 import co.com.ceiba.mobile.pruebadeingreso.rest.Endpoints.URL_BASE
 import dagger.Module
 import dagger.Provides
@@ -19,6 +20,7 @@ object NetworkModule {
     @Provides
     fun provideAPIService(): APIService = Retrofit.Builder()
         .baseUrl(URL_BASE)
+        .client(HttpClient.okHttpClient)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(APIService::class.java)
