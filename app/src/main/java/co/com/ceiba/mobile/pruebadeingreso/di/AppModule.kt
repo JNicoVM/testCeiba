@@ -1,5 +1,11 @@
 package co.com.ceiba.mobile.pruebadeingreso.di
 
+import co.com.ceiba.mobile.pruebadeingreso.data.db.DbService
+import co.com.ceiba.mobile.pruebadeingreso.data.db.dao.UserDao
+import co.com.ceiba.mobile.pruebadeingreso.data.network.APIService
+import co.com.ceiba.mobile.pruebadeingreso.data.network.HttpService
+import co.com.ceiba.mobile.pruebadeingreso.domain.AppRepository
+import co.com.ceiba.mobile.pruebadeingreso.domain.Repository
 import co.com.ceiba.mobile.pruebadeingreso.utils.DispatcherProvider
 import dagger.Module
 import dagger.Provides
@@ -26,4 +32,11 @@ object AppModule {
             get() = Dispatchers.Unconfined
 
     }
+
+    @Singleton
+    @Provides
+    fun provideAppRepository(
+        dao: DbService,
+        api: HttpService
+    ) = AppRepository(dao = dao, api = api) as Repository
 }
