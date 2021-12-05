@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         /**
          * @Deprecated To use a progressbar||progressDialog is recommended to use a view component in a constraintLayout
          */
@@ -43,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         initRecyclerView()
         initEditTextView()
         getUsers()
-        setContentView(binding.root)
+
     }
 
     /**
@@ -86,7 +87,13 @@ class MainActivity : AppCompatActivity() {
                        loadingDialog.hide()
                        binding.textError.visibility = View.GONE
                        binding.recyclerViewSearchResults.visibility =  View.VISIBLE
-                       userAdapter.differ.submitList(mainEvent.users)
+                       if(mainEvent.users.isNotEmpty()){
+                           userAdapter.differ.submitList(mainEvent.users)
+                       }else{
+                           binding.textError.visibility = View.VISIBLE
+                           binding.recyclerViewSearchResults.visibility =  View.GONE
+                           Toast.makeText(this@MainActivity, "No data found", Toast.LENGTH_SHORT).show()
+                       }
                    }
                    is MainViewModel.MainEvent.Failure ->{
                        loadingDialog.hide()

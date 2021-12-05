@@ -12,6 +12,7 @@ import co.com.ceiba.mobile.pruebadeingreso.utils.DispatcherProvider
 import co.com.ceiba.mobile.pruebadeingreso.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import okhttp3.Dispatcher
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,6 +40,12 @@ class MainViewModel @Inject constructor(
     val localUserList: List<User>
         get() = _localUserList
 
+    /**
+     *  Get User List
+     *  search at the local DB for users if
+     *  ...Doesn't find users It calls @GetUserNetWorkUserCase and then save in DB once the data arrives
+     *  ...Does find users It gives the view data to show users
+     */
     fun getUserList() {
         viewModelScope.launch(dispatchers.io) {
             _userCall.postValue(MainEvent.Loading)
@@ -73,6 +80,11 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    /**
+     * GET user by search input
+     * By a @String search in each local list element to found out if
+     * ...It contains an element, then It is shown at the view with similar elements
+     */
     fun getUserBySearchInput(searchInput: String) {
         viewModelScope.launch(dispatchers.io) {
             _userCall.postValue(MainEvent.Loading)
