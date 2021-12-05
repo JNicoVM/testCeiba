@@ -20,6 +20,9 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
             binding.name.text = user.name
             binding.phone.text = user.phone
             binding.email.text = user.email
+            binding.btnViewPost.setOnClickListener {
+                onItemClickListener?.let { it1 -> it1(user) }
+            }
         }
     }
 

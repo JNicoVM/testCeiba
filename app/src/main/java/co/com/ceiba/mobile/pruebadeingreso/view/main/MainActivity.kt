@@ -8,14 +8,14 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
 import android.app.ProgressDialog
-import android.opengl.Visibility
+import android.content.Intent
 import android.view.View
 import android.widget.Toast
 import androidx.core.widget.doAfterTextChanged
-import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import co.com.ceiba.mobile.pruebadeingreso.adapters.UserAdapter
-import java.time.Duration
+import co.com.ceiba.mobile.pruebadeingreso.rest.Const
+import co.com.ceiba.mobile.pruebadeingreso.view.post.PostActivity
 
 
 @AndroidEntryPoint
@@ -52,6 +52,14 @@ class MainActivity : AppCompatActivity() {
     private fun initRecyclerView(){
         userAdapter = UserAdapter()
         binding.recyclerViewSearchResults.layoutManager = LinearLayoutManager(this)
+        userAdapter.setOnItemClickListener { user->
+            val intent =  Intent(this@MainActivity, PostActivity::class.java)
+            intent.putExtra(Const.ID, user.id)
+            intent.putExtra(Const.NAME, user.name)
+            intent.putExtra(Const.EMAIL, user.email)
+            intent.putExtra(Const.PHONE, user.phone)
+            startActivity(intent)
+        }
         binding.recyclerViewSearchResults.adapter = userAdapter
     }
 
